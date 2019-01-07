@@ -1,0 +1,7 @@
+
+source/BigScreenGraph/build/built-jar.properties
+*.class
+*.jar
+source/BigScreenGraph/build/classes/.netbeans_update_resources
+source/BigScreenGraph/build/classes/.netbeans_automatic_build
+source/BigScreenGraph/dist/README.TXT
