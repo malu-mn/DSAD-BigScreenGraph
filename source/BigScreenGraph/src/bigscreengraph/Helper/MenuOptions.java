@@ -1,17 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Malu(2018AB04154), Sanjib(2018AB04153), Pradeep(2018AB04152)
  */
 package bigscreengraph.Helper;
 
 /**
- *
- * @author MNadara
+ * Menu options enumeration used for interacting with the user to operate
+ * on the graph.
  */
 public enum MenuOptions {
     LoadAnotherFile(1),
-    DisplayActorsAndMovies(2),
+    DisplayMoviesAndActors(2),
     DisplayMovies(3),
     DisplayActors(4),
     DisplayMoviesOfActor(5),

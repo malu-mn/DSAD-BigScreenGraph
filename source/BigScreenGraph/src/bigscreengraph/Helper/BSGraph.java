@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ /**
+ * @author Malu(2018AB04154), Sanjib(2018AB04153), Pradeep(2018AB04152)
  */
 package bigscreengraph.Helper;
 
@@ -11,84 +10,83 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
- *
- * @author MNadara
+ * Bigscreen graph helper to handle the graph operations
  */
 public class BSGraph {
-
     private final String delimiter = "/";
-    private Graph _graph = null;
+    private Graph graph = null;
+    
+    //maximum number of actors per movie
+    private maxActorsPerMovie = 2;
 
-    public void readActMovfile(ArrayList<String> fileContent) {
-        try {
-            _graph = ProcessToGraph(fileContent);
-            System.out.println("Graph formed.");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+    /**
+     * Constructor - initialize with the maximum number of actors allowed per movie
+     */
+    public BSGraph(int maxActorsPerMovie){
+    	this.maxActorsPerMovie = maxActorsPerMovie;
     }
-
-    private Graph ProcessToGraph(ArrayList<String> fileContent) throws Exception {
-        Graph graph;
-
+    
+    /**
+     * Process each line and created nodes and edges in the graph
+     */
+    private CreateGraph(ArrayList<String> movieList) throws Exception {
         // Initialize graph, with max number of vertex possible and the edge limited to 2
-        graph = new Graph(fileContent.size() * 3, 2);
+        graph = new Graph(movieList.size() * 3, 2);
 
-        for (int index = 0; index < fileContent.size(); index++) {
-            // In each line, first will be movie, other 2 will be actors.
-            String[] movieActors = fileContent.get(index).split(delimiter);
+        for (int index = 0; index < movieList.size(); index++) {
+            // In each line, first will be movie, others will be actors.
+            String[] movieInfo = movieList.get(index).split(delimiter);
 
-            if (movieActors.length != 3) {
-                // line number starts at 1, where as index at 0.
-                throw new Exception("Invalid format in the file at line number " + ++index);
+            // check if the number of actors is as per the limit per movie.
+            if (movieInfo.length > maxActorsPerMovie + 1 || movieInfo.length < 2) {
+                throw new Exception("Invalid format in the file at line number " + (index+1));
             }
 
-            Vertex movie = graph.AddVertex(movieActors[0].trim(), VertexType.MOVIE.toString());
-            Vertex actor1 = graph.AddVertex(movieActors[1].trim(), VertexType.ACTOR.toString());
-            Vertex actor2 = graph.AddVertex(movieActors[2].trim(), VertexType.ACTOR.toString());
-
-            if (graph.CanAddEdge(movie, actor1) && graph.CanAddEdge(movie, actor2)) {
-                graph.AddEdge(movie, actor1);
-                graph.AddEdge(movie, actor2);
-            } else {
-                throw new Exception(" Can't add edges for line : " + fileContent.get(index));
-            }
+            Vertex movie = graph.AddVertex(movieInfo[0].trim(), VertexType.MOVIE.toString());
+            
+            for (int j = 1; j < movieInfo.length; j++){
+                Vertex actor = graph.AddVertex(movieInfo[j].trim(), VertexType.ACTOR.toString());
+	            if (graph.CanAddEdge(movie, actor)) {
+	                graph.AddEdge(movie, actor);
+	            } else {
+	                throw new Exception("Can't add edges for line: " + movieList.get(index));
+	            }
+        	}
         }
-        return graph;
     }
 
-    public void displayActMov() {
+    public void DisplayGraph() {
         System.out.println("--GRAPH--");
-        _graph.displayGraph();
+        graph.displayGraph();
     }
 
-    public void displayActMov(VertexType type) {
+    public void DisplayGraph(VertexType type) {
         System.out.println("--GRAPH-- ( Only " + type.toString() + ") vertices");
-        _graph.displayGraph(type.toString());
+        graph.displayGraph(type.toString());
     }
 
-    public void displayMoviesOfActor(String actor) {
+    public void DisplayMoviesOfActor(String actor) {
         System.out.println("Movies of : " + actor);
-        _graph.displayEdges(actor, VertexType.ACTOR.toString());
+        graph.displayEdges(actor, VertexType.ACTOR.toString());
     }
 
-    public void displayActorsOfMovie(String movie) {
+    public void DisplayActorsOfMovie(String movie) {
         System.out.println("Actors in : " + movie);
-        _graph.displayEdges(movie, VertexType.MOVIE.toString());
+        graph.displayEdges(movie, VertexType.MOVIE.toString());
     }
 
-    public void findMovieRelatingActor(String movieA, String movieB) throws Exception {
-        Vertex v1 = _graph.getVertex(movieA, VertexType.MOVIE.toString());
+    public void FindMovieRelatingActor(String movieA, String movieB) throws Exception {
+        Vertex v1 = graph.getVertex(movieA, VertexType.MOVIE.toString());
         if (v1 == null) {
             throw new Exception(" Didn't find " + movieA + " in the graph");
         }
 
-        Vertex v2 = _graph.getVertex(movieB, VertexType.MOVIE.toString());
+        Vertex v2 = graph.getVertex(movieB, VertexType.MOVIE.toString());
         if (v2 == null) {
             throw new Exception(" Didn't find " + movieB + " in the graph");
         }
 
-        Vertex relatingActor = _graph.findRelatingVertex(v1, v2);
+        Vertex relatingActor = graph.findRelatingVertex(v1, v2);
 
         if (relatingActor != null) {
             System.out.println(v1 + " Related to " + v2 + " through :"
@@ -101,17 +99,17 @@ public class BSGraph {
     }
 
     public void findMovieTransRelation(String movieA, String movieB) throws Exception {
-        Vertex v1 = _graph.getVertex(movieA, VertexType.MOVIE.toString());
+        Vertex v1 = graph.getVertex(movieA, VertexType.MOVIE.toString());
         if (v1 == null) {
             throw new Exception(" Didn't find " + movieA + " in the graph");
         }
 
-        Vertex v2 = _graph.getVertex(movieB, VertexType.MOVIE.toString());
+        Vertex v2 = graph.getVertex(movieB, VertexType.MOVIE.toString());
         if (v2 == null) {
             throw new Exception(" Didn't find " + movieB + " in the graph");
         }
 
-        LinkedList<Vertex> bsfPath = _graph.getBsfPath(v1, v2);
+        LinkedList<Vertex> bsfPath = graph.getBsfPath(v1, v2);
         if (bsfPath != null) {
             System.out.print(" BFS Path :");
             displayPath(bsfPath);
@@ -119,7 +117,7 @@ public class BSGraph {
             System.out.print("No BFS Path :");
         }
 
-        LinkedList<Vertex> dsfPath = _graph.getDsfPath(v1, v2);
+        LinkedList<Vertex> dsfPath = graph.getDsfPath(v1, v2);
         if (dsfPath != null) {
             System.out.print(" DFS Path :");
             displayPath(dsfPath);
@@ -127,7 +125,7 @@ public class BSGraph {
             System.out.print("No DFS Path :");
         }
 
-        LinkedList<Vertex> relation = _graph.findTransitiveRelation(v1, v2);
+        LinkedList<Vertex> relation = graph.findTransitiveRelation(v1, v2);
 
         if (relation != null) {
             System.out.println(v1 + " Related to " + v2 + " through :");
@@ -144,6 +142,15 @@ public class BSGraph {
     }
 
     boolean hasValidGraph() {
-        return _graph != null;
+        return graph != null;
     }
+    
+//  public void readActMovfile(ArrayList<String> fileContent) {
+//  try {
+//      graph = ProcessToGraph(fileContent);
+//      System.out.println("Graph created.");
+//  } catch (Exception ex) {
+//      System.out.println(ex.getMessage());
+//  }
+//}
 }
